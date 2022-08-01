@@ -1,0 +1,9 @@
+# Spring properties
+##spring:
+ ## application:
+  ##  name: mongo
+  ## data:
+   ## mongodb.host: localhost
+   ## mongodb.port: 8082
+   ## mongodb.uri: mongodb://localhost/mongo
+   ## mongo.repositories.enabled: true

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="br.com.stefanini.repository">        
+     <select id="buscarTodos" resultType="br.com.stefanini.model.Pessoa">        
+        SELECT          
+            CD_PESSOA,        
+            NM_PESSOA, 
+            EMAIL,
+            DT_NASCIMENTO,
+            NATURALIDADE,
+            NASCIONALIDADE,
+            NR_DOCUMENTO,
+            SEXO,
+            CEP,
+            DT_CADASTRO,
+            DT_ATUALIZACAO 
+        FROM TB_PESSOA    
+     </select>
+
+     <select id="verificarPessoaExistente" resultType="String">        
+        SELECT COUNT(1) FROM TB_PESSOA WHERE NR_DOCUMENTO = #{nrDocumento}     
+     </select>
+
+    <select id="buscarPorCodigo" resultMap="pessoa">      
+        SELECT          
+            CD_PESSOA,        
+            NM_PESSOA, 
+            EMAIL,
+            DT_NASCIMENTO,
+            NATURALIDADE,
+            NASCIONALIDADE,
+            NR_DOCUMENTO,
+            SEXO,
+            CEP,
+            DT_CADASTRO,
+            DT_ATUALIZACAO        
+            FROM TB_PESSOA  
+            <trim prefix="WHERE" prefixOverrides="AND">    
+                <if test="cdPessoa != null">              
+                    AND CD_PESSOA = #{cdPessoa}           
+                </if>         
+                <if test="nmPessoa != null">               
+                    AND NM_PESSOA like '%' + #{nmPessoa} +'%'            
+                </if>
+                <if test="nrDocumento != null">               
+                    AND NR_DOCUMENTO like '%' + #{nrDocumento} +'%'            
+                </if>
+            </trim>     
+    </select>      
+                         
+    <insert id="inserir">                
+        <selectKey            
+            keyProperty="cdPessoa" 
+            resultType="int"           
+            order="BEFORE"            
+            statementType="PREPARED">                        
+            SELECT COALESCE(MAX(CD_PESSOA), 0) + 1 AS cdPessoa FROM TB_PESSOA                    
+        </selectKey>                
+        
+        INSERT INTO TB_PESSOA(
+            CD_PESSOA,        
+            NM_PESSOA, 
+            EMAIL,
+            DT_NASCIMENTO,
+            NATURALIDADE,
+            NASCIONALIDADE,
+            NR_DOCUMENTO,
+            SEXO,
+            CEP,
+            DT_CADASTRO,
+            DT_ATUALIZACAO
+            ) VALUES (
+            #{cdPessoa},
+            #{nmPessoa}, 
+            #{email}, 
+            #{dtNascimento}, 
+            #{naturalidade},
+            #{nacionalidade},
+            #{nrDocumento},
+            #{sexo},
+            #{cep},
+            GETDATE(), 
+            GETDATE())    
+    </insert>        
+            
+    <update id="atualizar">        
+        UPDATE TB_PESSOA       
+            <set>            
+                <if test="nmPessoa != null">               
+                    NM_PESSOA = #{nmPessoa},           
+                </if>            
+                <if test="email != null">                
+                    EMAIL = #{email},            
+                </if>            
+                <if test="dtNascimento != null">                
+                    DT_NASCIMENTO = #{dtNascimento},            
+                </if>            
+                <if test="naturalidade != null">                
+                    NATURALIDADE = #{naturalidade},            
+                </if>    
+                <if test="nacionalidade != null">                
+                    NASCIONALIDADE = #{nacionalidade},            
+                </if> 
+                <if test="nrDocumento != null">                
+                    NR_DOCUMENTO = #{nrDocumento},            
+                </if> 
+                <if test="sexo != null">                
+                    SEXO = #{sexo},            
+                </if> 
+                <if test="cep != null">                
+                    CEP = #{cep},            
+                </if>                     
+                DT_ATUALIZACAO = GETDATE()        
+            </set>                
+                WHERE CD_PESSOA = #{cdPessoa}    
+    </update>        
+ 
+    <delete id="excluirPessoa">        
+        DELETE FROM TB_PESSOA WHERE CD_PESSOA = #{cdPessoa}   
+    </delete> 
+        
+    <resultMap id="pessoa" type="br.com.stefanini.model.Pessoa">       
+         <result property="cdPessoa" column="CD_PESSOA" />        
+         <result property="nmPessoa" column="NM_PESSOA" />        
+         <result property="email" column="EMAIL" />        
+         <result property="dtNascimento" column="DT_NASCIMENTO" />        
+         <result property="naturalidade" column="NATURALIDADE" />        
+         <result property="nacionalidade" column="NASCIONALIDADE"/> 
+         <result property="nrDocumento" column="NR_DOCUMENTO"/> 
+         <result property="sexo" column="SEXO"/> 
+         <result property="cep" column="CEP"/> 
+         <result property="dtCadastro" column="DT_CADASTRO"/> 
+         <result property="dtAtualizacao" column="DT_ATUALIZACAO"/> 
+    </resultMap>   
+</mapper>
